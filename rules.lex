@@ -2,6 +2,7 @@
 %{
 #include "Token/Token.h"
 #include "Actions/actions.h"
+#include "Parser/parser.h"
 %}
 
 DIGIT	  [1-9]
@@ -16,7 +17,7 @@ ID	      [a-zA-Z]+{DIGITZ}*(_([a-zA-Z]|{DIGITZ})+)*
 program|end|real|integer|void|return 	keyword_action(TOKEN_KEYWORD, yytext, yylineno);
 "["|"]"|"{"|"}"|","|";"|"("|")"			sep_action(TOKEN_SEP, yytext, yylineno);
 {ID}	       							id_action(TOKEN_ID, yytext, yylineno);
-<<EOF>> 								{eof_action(TOKEN_EOF, yytext, yylineno); return 0;}
+<<EOF>> 								{eof_action(TOKEN_EOF, yytext, yylineno); parser(); return 0;}
 "--"+|[[:space:]]+						;
 . 										print_error(yytext, yylineno);
 
@@ -27,9 +28,9 @@ int main(int argc, char** argv)
    ++argv, --argc;	/* skip over program name */
 
    if (argc == 1)
-    	yyin = fopen(argv[0], "r");
+		yyin = fopen(argv[0], "r");
    else
-      yyin = stdin;
+      	yyin = stdin;
 
    yylex();
 }

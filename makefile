@@ -1,5 +1,5 @@
-all: lex.yy.c Actions/actions.c Token/Token.c
-	gcc lex.yy.c Actions/actions.c Token/Token.c -o scanner
+all: lex.yy.c Actions/actions.c Token/Token.c Parser/parser.c
+	gcc lex.yy.c Actions/actions.c Token/Token.c Parser/parser.c -o scanner
 	
 lex.yy.c:
 	flex rules.lex
