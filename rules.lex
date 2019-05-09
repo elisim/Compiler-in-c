@@ -47,4 +47,7 @@ int main(int argc, char** argv)
    		curr = next_token();
    }
    printf("DONE\n");
+   fclose(yyin);
+   fclose(yyout);
+   return 0;
 }
