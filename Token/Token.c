@@ -89,7 +89,19 @@ void create_and_store_token(eTOKENS kind, char* lexeme, int numOfLine)
 /*
 * This function returns the token in the storage that is stored immediately before the current token (if exsits).
 */
-Token *back_token() { return NULL; }
+Token *back_token() 
+{ 
+	if (currentIndex == 0) /* if we in the start of the array */
+	{
+		currentNode = currentNode->prev; /* go one back */
+		currentIndex = TOKEN_ARRAY_SIZE - 1; /* start from the end */
+	}
+	else
+	{
+		currentIndex--;	
+	}
+	return &currentNode->tokensArray[currentIndex];
+}
 
 /*
 * If the next token already exists in the storage (this happens when back_token was called before this call to next_token): 
@@ -99,7 +111,14 @@ Token *back_token() { return NULL; }
 */
 Token *next_token() 
 { 
-	yylex();
+	if (currentIndex == TOKEN_ARRAY_SIZE-1 && currentNode->next != NULL) /* if we in the end and there is next */
+	{
+		currentNode = currentNode->next;
+		currentIndex = 0;	
+	}
+	else 
+	{
+		yylex();
+	}
 	return &currentNode->tokensArray[currentIndex];
 }
-
