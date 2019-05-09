@@ -3,6 +3,8 @@
 
 #include "../Token/Token.h"
 
+extern FILE *yyout;
+
 static const char* token_kinds[] = 
 {
 	"IDENTIFIER", 
@@ -39,11 +41,11 @@ static const char* token_kinds[] =
 
 void print_error(char*, int);
 void print_token_found(eTOKENS, char*, int);
-void id_action(eTOKENS, char*, int);
-void operator_action(eTOKENS, char*, int);
-void number_action(eTOKENS, char*, int);
-void sep_action(eTOKENS, char*, int);
-void keyword_action(eTOKENS, char*, int);
-void eof_action(eTOKENS, char*, int);
+int id_action(eTOKENS, char*, int);
+int operator_action(eTOKENS, char*, int);
+int number_action(eTOKENS, char*, int);
+int sep_action(eTOKENS, char*, int);
+int keyword_action(eTOKENS, char*, int);
+int eof_action(eTOKENS, char*, int);
 
 #endif

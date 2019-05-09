@@ -6,6 +6,7 @@
 #include <string.h>
 
 extern FILE *yyin, *yyout;
+extern int yylex();
 
 typedef enum eTOKENS
 {

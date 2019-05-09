@@ -97,4 +97,9 @@ Token *back_token() { return NULL; }
 * Else: continues to read the input file in order to identify, create and store a new token (using yylex function);
 *  returns the token that was created.
 */
-Token *next_token() { return NULL; }
+Token *next_token() 
+{ 
+	yylex();
+	return &currentNode->tokensArray[currentIndex];
+}
+

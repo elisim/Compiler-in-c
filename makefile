@@ -9,6 +9,6 @@ lex.yy.c:
 
 #Clean the build directory	
 clean: 
-	rm -vf scanner lex.yy.c
+	rm -vf scanner lex.yy.c out.txt
 run:
-	./scanner
+	./scanner ass1_test.txt

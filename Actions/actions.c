@@ -6,34 +6,37 @@
 
 void print_error(char* character, int line_number)
 {
-	printf("The character '%s' at line: %d does not begin any legal token in the language.\n", character, line_number);
+	fprintf(yyout, "The character '%s' at line: %d does not begin any legal token in the language.\n", character, line_number);
 }
 
 void print_token_found(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	const char *token_name = token_kinds[token_kind];
-	printf("Token of kind '%s' was found at line: %d, lexeme: '%s'.\n", token_name, line_number, lexeme);
+	fprintf(yyout, "Token of kind '%s' was found at line: %d, lexeme: '%s'.\n", token_name, line_number, lexeme);
 }
 
-void id_action(eTOKENS token_kind, char* lexeme, int line_number)
+int id_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	create_and_store_token(token_kind, lexeme, line_number);
 	print_token_found(token_kind, lexeme, line_number);
+	return 0;
 }
 
-void number_action(eTOKENS token_kind, char* lexeme, int line_number)
+int number_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	create_and_store_token(token_kind, lexeme, line_number);
 	print_token_found(token_kind, lexeme, line_number);
+	return 0;
 }
 
-void eof_action(eTOKENS token_kind, char* lexeme, int line_number)
+int eof_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	create_and_store_token(token_kind, lexeme, line_number);
 	print_token_found(token_kind, lexeme, line_number);
+	return 0;
 }
 
-void operator_action(eTOKENS token_kind, char* lexeme, int line_number)
+int operator_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	eTOKENS kind = token_kind;
 
@@ -48,9 +51,10 @@ void operator_action(eTOKENS token_kind, char* lexeme, int line_number)
 
 	create_and_store_token(kind, lexeme, line_number);
 	print_token_found(kind, lexeme, line_number);
+	return 0;
 }
 
-void sep_action(eTOKENS token_kind, char* lexeme, int line_number)
+int sep_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	eTOKENS kind = token_kind;
 
@@ -75,9 +79,10 @@ void sep_action(eTOKENS token_kind, char* lexeme, int line_number)
 
 	create_and_store_token(kind, lexeme, line_number);
 	print_token_found(kind, lexeme, line_number);
+	return 0;
 }
 
-void keyword_action(eTOKENS token_kind, char* lexeme, int line_number)
+int keyword_action(eTOKENS token_kind, char* lexeme, int line_number)
 {
 	eTOKENS kind = token_kind;
 
@@ -98,4 +103,5 @@ void keyword_action(eTOKENS token_kind, char* lexeme, int line_number)
 
 	create_and_store_token(kind, lexeme, line_number);
 	print_token_found(kind, lexeme, line_number);
+	return 0;
 }

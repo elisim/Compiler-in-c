@@ -1,4 +1,6 @@
 %option yylineno
+%option noyywrap
+
 %{
 #include "Token/Token.h"
 #include "Actions/actions.h"
@@ -11,20 +13,21 @@ ID	      [a-zA-Z]+{DIGITZ}*(_([a-zA-Z]|{DIGITZ})+)*
 
 %% 
 
-0|{DIGIT}{DIGITZ}*	 					number_action(TOKEN_INT_NUMBER, yytext, yylineno);
-{DIGIT}+"."{DIGITZ}+|0"."{DIGITZ}+		number_action(TOKEN_REAL_NUMBER, yytext, yylineno);
-"*"|"/"|"="								operator_action(TOKEN_OP, yytext, yylineno);
-program|end|real|integer|void|return 	keyword_action(TOKEN_KEYWORD, yytext, yylineno);
-"["|"]"|"{"|"}"|","|";"|"("|")"			sep_action(TOKEN_SEP, yytext, yylineno);
-{ID}	       							id_action(TOKEN_ID, yytext, yylineno);
-<<EOF>> 								{eof_action(TOKEN_EOF, yytext, yylineno); parser(); return 0;}
-"--"+|[[:space:]]+						;
-. 										print_error(yytext, yylineno);
+0|{DIGIT}{DIGITZ}*	 					   return number_action(TOKEN_INT_NUMBER, yytext, yylineno);
+{DIGIT}+"."{DIGITZ}+|0"."{DIGITZ}+		return number_action(TOKEN_REAL_NUMBER, yytext, yylineno);
+"*"|"/"|"="								      return operator_action(TOKEN_OP, yytext, yylineno);
+program|end|real|integer|void|return 	return keyword_action(TOKEN_KEYWORD, yytext, yylineno);
+"["|"]"|"{"|"}"|","|";"|"("|")"			return sep_action(TOKEN_SEP, yytext, yylineno);
+{ID}	       							      return id_action(TOKEN_ID, yytext, yylineno);
+<<EOF>> 								         return eof_action(TOKEN_EOF, yytext, yylineno); 
+"--".*|[[:space:]]+					     	;
+. 										         print_error(yytext, yylineno);
 
 %%
 
 int main(int argc, char** argv)
 {
+	printf("Start running scanner\n");
    ++argv, --argc;	/* skip over program name */
 
    if (argc == 1)
@@ -32,11 +35,16 @@ int main(int argc, char** argv)
    else
       	yyin = stdin;
 
-   yylex();
-}
-
-
-int yywrap()
-{
-	return 1;
+   yyout = fopen("out.txt", "w");
+   Token *curr = next_token();
+   while(curr->kind != TOKEN_EOF) 
+   {
+   		printf("kind = %s\n", token_kinds[curr->kind]);
+   		printf("lexeme = %s\n", curr->lexeme);
+   		printf("line = %d\n",  curr->lineNumber);
+         printf("OK?\n");
+         getchar();
+   		curr = next_token();
+   }
+   printf("DONE\n");
 }
