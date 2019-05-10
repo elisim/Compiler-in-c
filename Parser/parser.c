@@ -1,30 +1,51 @@
 #include "parser.h"
+#include "../Actions/actions.h"
 #include <stdio.h>
 #include <string.h>
 
-int parser()
+/*
+SUCCESS 0
+FAIL 1
+*/
+
+Token *current_token = NULL;
+
+int match(eTOKENS token)
 {
-	printf("IN PARSER\n");
+	current_token = next_token();
+	printf("kind = %s\n", token_kinds[current_token->kind]);
+   	printf("lexeme = %s\n", current_token->lexeme);
+   	printf("line = %d\n",  current_token->lineNumber);
+    printf("OK?\n");
+    getchar();
+
+	if (current_token->kind != token)
+	{
+		return 1;		
+	}
 	return 0;
 }
+
 
 // PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS
 int PROGRAM()
 {
-	if (strncpy(foo, keyword_program, strlen(keyword_program) != 0))
+	if (match(TOKEN_KEYWORD_PROGRAM) != 0)
 		return FAIL;
 	if (VAR_DEFINITIONS() == FAIL)
 		return error();
-	if (strncpy(foo, semicolon, strlen(semicolon) != 0))
+	if (match(TOKEN_SEMICOLON) != 0)
 		return error();
 	if (STATEMENTS() == FAIL)
 		return error();
-	if (strncpy(foo, keyword_end, strlen(keyword_end) != 0))
+	if (match(TOKEN_KEYWORD_END) != 0)
 		return error();
 	if (FUNC_DEFINITIONS() == FAIL)
 		return error();
+	if (match(TOKEN_EOF) != 0)
+		return error();
 
-	// action
+	printf("Rule(PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS)");
 	return SUCCESS;
 }
 
@@ -45,6 +66,6 @@ int FUNC_DEFINITIONS()
 
 int error()
 {
-	// error msg
+	printf("ERROR\n");
 	return FAIL;
 }

@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include "actions.h"
 #include "../Token/Token.h"
-#include "../Actions/actions.h"
+
 
 
 void print_error(char* character, int line_number)

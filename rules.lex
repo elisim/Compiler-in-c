@@ -36,16 +36,8 @@ int main(int argc, char** argv)
       	yyin = stdin;
 
    yyout = fopen("out.txt", "w");
-   Token *curr = next_token();
-   while(curr->kind != TOKEN_EOF) 
-   {
-   		printf("kind = %s\n", token_kinds[curr->kind]);
-   		printf("lexeme = %s\n", curr->lexeme);
-   		printf("line = %d\n",  curr->lineNumber);
-         printf("OK?\n");
-         getchar();
-   		curr = next_token();
-   }
+   PROGRAM();
+  
    printf("DONE\n");
    fclose(yyin);
    fclose(yyout);

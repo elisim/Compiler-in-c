@@ -11,4 +11,4 @@ lex.yy.c:
 clean: 
 	rm -vf scanner lex.yy.c out.txt
 run:
-	./scanner ass1_test.txt
+	./scanner ass2_test.txt

@@ -1,5 +1,7 @@
 #ifndef PARSER_H
 #define PARSER_H
+#include "../Token/Token.h"
+
 #define SUCCESS 0
 #define FAIL 1
 
@@ -7,7 +9,7 @@
 
 int error();
 
-int parser();
+int match(eTOKENS token);
 
 /* === Non-Terminals Functions === */
 int PROGRAM();
