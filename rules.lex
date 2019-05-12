@@ -31,13 +31,14 @@ int main(int argc, char** argv)
    ++argv, --argc;	/* skip over program name */
 
    if (argc == 1)
-		yyin = fopen(argv[0], "r");
+		 yyin = fopen(argv[0], "r");
    else
-      	yyin = stdin;
+       yyin = stdin;
 
    yyout = fopen("out.txt", "w");
-   PROGRAM();
-  
+
+   parser();
+
    printf("DONE\n");
    fclose(yyin);
    fclose(yyout);

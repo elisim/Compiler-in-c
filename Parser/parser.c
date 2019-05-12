@@ -8,18 +8,18 @@ SUCCESS 0
 FAIL 1
 */
 
-Token *current_token = NULL;
+Token *curr_token = NULL;
+
+void parser()
+{
+	PROGRAM();
+   	match(TOKEN_EOF);
+}
 
 int match(eTOKENS token)
 {
-	current_token = next_token();
-	printf("kind = %s\n", token_kinds[current_token->kind]);
-   	printf("lexeme = %s\n", current_token->lexeme);
-   	printf("line = %d\n",  current_token->lineNumber);
-    printf("OK?\n");
-    getchar();
-
-	if (current_token->kind != token)
+	curr_token = next_token();
+	if (curr_token->kind != token)
 	{
 		return 1;		
 	}
@@ -27,7 +27,7 @@ int match(eTOKENS token)
 }
 
 
-// PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS
+/* PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS */
 int PROGRAM()
 {
 	if (match(TOKEN_KEYWORD_PROGRAM) != 0)
@@ -42,14 +42,23 @@ int PROGRAM()
 		return error();
 	if (FUNC_DEFINITIONS() == FAIL)
 		return error();
-	if (match(TOKEN_EOF) != 0)
-		return error();
 
 	printf("Rule(PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS)");
 	return SUCCESS;
 }
 
+/* VAR_DEFINITIONS -> VAR_DEFINITION | VAR_DEFINITION; VAR_DEFINITIONS */
 int VAR_DEFINITIONS()
+{
+	if (VAR_DEFINITION() == FAIL)
+	{
+		if(VAR_DEFINITION() == FAIL)
+			return error();
+	}
+
+}
+
+int VAR_DEFINITION();
 {
 	return SUCCESS;
 }
@@ -68,4 +77,10 @@ int error()
 {
 	printf("ERROR\n");
 	return FAIL;
+}
+
+int TYPE();
+{
+	match(TOKEN_KEYWORD_REAL);
+	match(TOKEN_KEYWORD_INTEGER);
 }

@@ -10,8 +10,9 @@
 int error();
 
 int match(eTOKENS token);
+void parser();
 
-/* === Non-Terminals Functions === */
+/* === Parsing Functions === */
 int PROGRAM();
 int VAR_DEFINITIONS();
 int VAR_DEFINITION();
