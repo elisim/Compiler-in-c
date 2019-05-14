@@ -7,28 +7,36 @@
 
 #include "tokens_names.h"
 
+extern FILE *parser_out;
+
 int error();
 
 int match(eTOKENS token);
 void parser();
 
 /* === Parsing Functions === */
-int PROGRAM();
-int VAR_DEFINITIONS();
-int VAR_DEFINITION();
-int TYPE();
-int VARIABLES_LIST();
-int VARIABLES_LIST_TEMP();
-int VARIABLE();
-int FUNC_DEFINITIONS();
-int FUNC_DEFINITIONS_TEMP();
-int FUNC_DEFINITION();
-int RETURNED_TYPE();
-int PARAM_DEFINITIONS();
-int STATEMENTS();
-int STATEMENT();
-int BLOCK();
-int FUNCTION_CALL();
-int PARAMETERS_LIST();
-int EXPRESSION();
+void PROGRAM();
+void VAR_DEFINITIONS();
+void VAR_DEFINITIONS_TEMP();
+void VAR_DEFINITION();
+void TYPE();
+void VARIABLES_LIST();
+void VARIABLES_LIST_TEMP();
+void VARIABLE();
+void VARIABLE_TEMP();
+void FUNC_DEFINITIONS();
+void FUNC_DEFINITIONS_TEMP();
+void FUNC_DEFINITION();
+void RETURNED_TYPE();
+void PARAM_DEFINITIONS();
+void STATEMENTS();
+void STATEMENTS_TEMP();
+void STATEMENT();
+void STATEMENT_TEMP();
+void STATEMENT_TWO_TEMP();
+void BLOCK();
+void FUNCTION_CALL();
+void PARAMETERS_LIST();
+void EXPRESSION();
+void EXPRESSION_TEMP();
 #endif

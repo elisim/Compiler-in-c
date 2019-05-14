@@ -5,6 +5,7 @@
 #include "Token/Token.h"
 #include "Actions/actions.h"
 #include "Parser/parser.h"
+FILE *parser_out = NULL;
 %}
 
 DIGIT	  [1-9]
@@ -36,6 +37,7 @@ int main(int argc, char** argv)
        yyin = stdin;
 
    yyout = fopen("out.txt", "w");
+   parser_out = fopen("parse.txt", "w");
 
    parser();
 
