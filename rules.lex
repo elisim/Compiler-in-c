@@ -6,6 +6,7 @@
 #include "Actions/actions.h"
 #include "Parser/parser.h"
 FILE *parser_out = NULL;
+int debug = 0;
 %}
 
 DIGIT	  [1-9]
@@ -31,18 +32,23 @@ int main(int argc, char** argv)
 	printf("Start running scanner\n");
    ++argv, --argc;	/* skip over program name */
 
-   if (argc == 1)
+   if (argc >= 1)
+   {
 		 yyin = fopen(argv[0], "r");
+     if (argc == 2)
+         debug = 1;
+   }
    else
        yyin = stdin;
 
-   yyout = fopen("out.txt", "w");
    parser_out = fopen("parse.txt", "w");
+   yyout = parser_out;
 
    parser();
 
    printf("DONE\n");
    fclose(yyin);
    fclose(yyout);
+   fclose(parser_out);
    return 0;
 }

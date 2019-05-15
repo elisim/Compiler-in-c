@@ -12,6 +12,7 @@ There are three functions providing an external access to the storage:
 
 int currentIndex = 0;
 Node* currentNode = NULL;
+int back = 0;
 
 #define TOKEN_ARRAY_SIZE 100
 
@@ -91,6 +92,7 @@ void create_and_store_token(eTOKENS kind, char* lexeme, int numOfLine)
 */
 Token *back_token() 
 { 
+	back++;
 	if (currentIndex == 0) /* if we in the start of the array */
 	{
 		currentNode = currentNode->prev; /* go one back */
@@ -100,7 +102,18 @@ Token *back_token()
 	{
 		currentIndex--;	
 	}
-	return &currentNode->tokensArray[currentIndex];
+	
+	Token *ans = &(currentNode->tokensArray[currentIndex]);
+	if (debug == 1)
+	{
+		printf("==== back token ====\n");
+		printf("kind = %s\n", token_kinds[ans->kind]);
+	   	printf("lexeme = %s\n", ans->lexeme);
+	   	printf("line = %d\n",  ans->lineNumber);
+	    printf("OK?\n");
+	    getchar();	
+	}
+    return ans;
 }
 
 /*
@@ -111,14 +124,40 @@ Token *back_token()
 */
 Token *next_token() 
 { 
-	if (currentIndex == TOKEN_ARRAY_SIZE-1 && currentNode->next != NULL) /* if we in the end and there is next */
-	{
-		currentNode = currentNode->next;
-		currentIndex = 0;	
+	if (back > 0)
+	{	
+		back--;	
+		if (currentNode != NULL)
+		{
+			if (currentIndex == TOKEN_ARRAY_SIZE - 1 && currentNode->next != NULL) /* in the end and there is next */
+			{
+				currentNode = currentNode->next;
+				currentIndex = 0;
+			}
+			// else if (currentNode->tokensArray[currentIndex+1] != NULL)
+			// {
+			// 	currentIndex++;
+			// }
+			else
+			{
+				currentIndex++;
+			}
+		}
 	}
-	else 
+	else
 	{
 		yylex();
 	}
-	return &currentNode->tokensArray[currentIndex];
+	
+	Token *ans = &(currentNode->tokensArray[currentIndex]);
+	if (debug == 1)
+	{
+		printf("==== next token ====\n");
+		printf("kind = %s\n", token_kinds[ans->kind]);
+	   	printf("lexeme = %s\n", ans->lexeme);
+	   	printf("line = %d\n",  ans->lineNumber);
+	    printf("OK?\n");
+	    getchar();	
+	}
+    return ans;
 }

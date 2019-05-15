@@ -5,10 +5,12 @@ lex.yy.c:
 	flex rules.lex
 
 #tell make that "clean" is not a file name!
-.PHONY: clean run
+.PHONY: clean run debug
 
 #Clean the build directory	
 clean: 
-	rm -vf scanner lex.yy.c out.txt
+	rm -vf scanner lex.yy.c out.txt parser.txt
 run:
 	./scanner ass2_test.txt
+debug: 
+	./scanner ass2_test.txt -d 

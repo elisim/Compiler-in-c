@@ -8,11 +8,14 @@
 #include "tokens_names.h"
 
 extern FILE *parser_out;
+extern int debug;
 
-int error();
-
+void error();
 int match(eTOKENS token);
 void parser();
+void output(char* rule);
+int contains_in(eTOKENS *arr, eTOKENS token, int size);
+// int recover(eTOKENS follows[], int size);
 
 /* === Parsing Functions === */
 void PROGRAM();
