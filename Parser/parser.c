@@ -9,6 +9,7 @@ TODO:
 2. rule FUNCTION CALL
 3. VARIABLE_DEFITINIOS_TEMP first and follow not disjoint
 4. error msg
+5. files to output
 */
 
 Token *curr_token = NULL;
@@ -32,11 +33,13 @@ int match(eTOKENS token)
 	}
 }
 
-// void error(eTOKENS expected[]);
+// void error()
 // {
-// 	// char *expected_str = expected[0].kind or  expected[1].kind ... expected[size].kind
-// 	// output("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'", 
-// 	// 		expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
+// 	eTOKENS expected[] = {TOKEN_RIGHT_BRACKET3};
+// 	int size = sizeof(expected)/sizeof(expected[0]);
+// 	char *expected_str = concatenate(size, expected, " or ");
+// 	fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'", 
+// 			expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 // }
 
 void error()
@@ -541,4 +544,27 @@ void EXPRESSION_TEMP()
 			error();
 			recover(follows, 1);
 	}
+}
+
+
+char *concatenate(size_t size, eTOKENS *array, const char *joint){
+    size_t jlen, lens[size];
+    size_t i, total_size = (size-1) * (jlen=strlen(joint)) + 1;
+    char *result, *p;
+
+
+    for(i=0;i<size;++i){
+        total_size += (lens[i]=strlen(token_kinds[array[i]]));
+    }
+    p = result = malloc(total_size);
+    for(i=0;i<size;++i){
+        memcpy(p, token_kinds[array[i]], lens[i]);
+        p += lens[i];
+        if(i<size-1){
+            memcpy(p, joint, jlen);
+            p += jlen;
+        }
+    }
+    *p = '\0';
+    return result;
 }
