@@ -5,9 +5,10 @@
 
 /*
 TODO: 
-1. error algo
-2. match
-3. when to call match
+1. match: when error, recover
+2. rule FUNCTION CALL
+3. VARIABLE_DEFITINIOS_TEMP first and follow not disjoint
+4. error msg
 */
 
 Token *curr_token = NULL;
@@ -31,11 +32,11 @@ int match(eTOKENS token)
 	}
 }
 
-// void error(eTOKENS actual, eTOKENS *expected);
+// void error(eTOKENS expected[]);
 // {
 // 	// char *expected_str = expected[0].kind or  expected[1].kind ... expected[size].kind
 // 	// output("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'", 
-// 	// 		expected_str, actual.lineNumber, token_kinds[actual.kind], actual.lexeme);
+// 	// 		expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 // }
 
 void error()
@@ -452,8 +453,10 @@ void BLOCK()
 }
 
 /* FUNCTION_CALL -> id (PARAMETERS_LIST) */
+// ========================================================= TODO
 void FUNCTION_CALL()
 {
+	eTOKENS follows[4] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_EOF};
 	curr_token = next_token();
 	output("FUNCTION_CALL -> id (PARAMETERS_LIST");
 
@@ -466,6 +469,7 @@ void FUNCTION_CALL()
 /* PARAMETERS_LIST -> ε | VARIABLES_LIST */
 void PARAMETERS_LIST()
 {
+	eTOKENS follows[1] = {TOKEN_RIGHT_BRACKET3};
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -480,12 +484,15 @@ void PARAMETERS_LIST()
 			break;
 		default:
 			error();
+			recover(follows, 1);
+
 	}
 }
 
 /* EXPRESSION -> int_number | real_number | id EXPRESSION_TEMP */
 void EXPRESSION()
 {
+	eTOKENS follows[1] = {TOKEN_SEMICOLON};
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -504,12 +511,14 @@ void EXPRESSION()
 			break;
 		default: 
 			error();
+			recover(follows, 1);
 	}
 }
 
 /* EXPRESSION_TEMP -> VARIABLE_TEMP | ar_op EXPRESSION */
 void EXPRESSION_TEMP()
 {
+	eTOKENS follows[1] = {TOKEN_SEMICOLON};
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -530,5 +539,6 @@ void EXPRESSION_TEMP()
 			break;
 		default: 
 			error();
+			recover(follows, 1);
 	}
 }

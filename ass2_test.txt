@@ -12,10 +12,12 @@ program
 		real varname;
 		real id_0_0, varname [5], i_j_k_0_0, varname [56];
 		{
+			real varname;
 			return;
 			ABCd_efg[0]= ABCd_efg / id_0_0 * 0.0;	
 			varname = 0.0;
 		};
+
 	}; 
 
 	return ABCd_efg / varname_0_0 / i_j_k / ABCd_efg * varname_0_0 [2]; 

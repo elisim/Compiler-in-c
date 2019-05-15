@@ -42,7 +42,7 @@ int main(int argc, char** argv)
        yyin = stdin;
 
    parser_out = fopen("parse.txt", "w");
-   yyout = parser_out;
+   yyout = fopen("scanner.txt", "w");
 
    parser();
 

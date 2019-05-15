@@ -9,7 +9,7 @@ lex.yy.c:
 
 #Clean the build directory	
 clean: 
-	rm -vf scanner lex.yy.c out.txt parser.txt
+	rm -vf scanner lex.yy.c scanner.txt parse.txt
 run:
 	./scanner ass2_test.txt
 debug: 
