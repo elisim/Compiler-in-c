@@ -6,7 +6,6 @@
 /*
 TODO: 
 1. match: when error, recover
-4. error msg
 5. files to output
 */
 
@@ -31,28 +30,24 @@ int match(eTOKENS token)
 	}
 }
 
-// void error(eTOKENS expected[])
-// {
-// 	int size = sizeof(expected)/sizeof(expected[0]);
-// 	char *expected_str = concatenate(size, expected, " or ");
-// 	fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'", 
-// 			expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
-// }
-
-void error()
+void error(eTOKENS expected[], int size)
 {
+	char *expected_str = concatenate(size, expected, " or ");
 	if (debug == 1)
-		printf("error\n");	
+		printf("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 	else
-		fprintf(parser_out, "error\n");
+		fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 }
+
 
 void recover(eTOKENS follows[], int size)
 {
-	// if (debug == 1)
-	// 	printf("recover\n");	
-	// else
-	// 	fprintf(parser_out, "recover\n");	
+	if (debug == 1)
+		printf("recover\n");	
+	else
+		fprintf(parser_out, "recover\n");	
 
 	do {
 		curr_token = next_token();
@@ -111,15 +106,14 @@ void VAR_DEFINITIONS()
 /* VAR_DEFINITIONS_TEMP -> ;VAR_DEFINITIONS | ε */
 void VAR_DEFINITIONS_TEMP()
 {
-	// output("======= IN VAR DEFS TEMP =========");
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
-	curr_token = next_token();
+	eTOKENS expected[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	Token* peek_token = NULL;
 
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_SEMICOLON:
-			// output("=============== peek ===========");
 			peek_token = peek();
 			if (peek_token->kind == TOKEN_KEYWORD_INTEGER || peek_token->kind == TOKEN_KEYWORD_REAL)
 			{
@@ -128,7 +122,6 @@ void VAR_DEFINITIONS_TEMP()
 			}
 			else 
 			{
-				// output("=============== else ===========");
 				curr_token = back_token();
 				output("VAR_DEFINITIONS_TEMP -> ε");
 			}
@@ -139,7 +132,7 @@ void VAR_DEFINITIONS_TEMP()
 			break;
 		default:
 			recover(follows, 2);
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 	}
 }
 
@@ -157,6 +150,8 @@ void VAR_DEFINITION()
 void TYPE()
 {
 	eTOKENS follows[1] = {TOKEN_ID};
+	eTOKENS expected[2] = {TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -169,7 +164,7 @@ void TYPE()
 			match(TOKEN_KEYWORD_INTEGER);
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -186,9 +181,10 @@ void VARIABLES_LIST()
 /* VARIABLES_LIST_TEMP -> ,VARIABLE VARIABLES_LIST_TEMP | ε */
 void VARIABLES_LIST_TEMP()
 {
-	curr_token = next_token();
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[3] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_COMMA:	
@@ -203,7 +199,7 @@ void VARIABLES_LIST_TEMP()
 			output("VARIABLES_LIST_TEMP -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 2);
 	}
 }
@@ -223,6 +219,8 @@ void VARIABLE()
 void VARIABLE_TEMP()
 {
 	eTOKENS follows[4] = {TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_RIGHT_BRACKET3, TOKEN_OP_EQUAL};
+	eTOKENS expected[5] = {TOKEN_LEFT_BRACKET1, TOKEN_COMMA, TOKEN_RIGHT_BRACKET3, TOKEN_SEMICOLON, TOKEN_OP_EQUAL};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -242,7 +240,7 @@ void VARIABLE_TEMP()
 			output("VARIABLE_TEMP -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 4);
 	}
 }
@@ -259,8 +257,10 @@ void FUNC_DEFINITIONS()
 /* FUNC_DEFINITIONS_TEMP -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP | ε */
 void FUNC_DEFINITIONS_TEMP()
 {
-	curr_token = next_token();
 	eTOKENS follows[1] = {TOKEN_EOF};
+	eTOKENS expected[4] = {TOKEN_KEYWORD_INTEGER, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_VOID, TOKEN_EOF};
+
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_KEYWORD_INTEGER:
@@ -277,7 +277,7 @@ void FUNC_DEFINITIONS_TEMP()
 			output("FUNC_DEFINITIONS_TEMP -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows,1);
 	}
 }
@@ -303,8 +303,10 @@ void FUNC_DEFINITION()
 /* RETURNED_TYPE  -> void | TYPE */
 void RETURNED_TYPE()
 {
-	curr_token = next_token();
 	eTOKENS follows[1] = {TOKEN_ID};
+	eTOKENS expected[3] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER};
+
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_KEYWORD_VOID:
@@ -318,7 +320,7 @@ void RETURNED_TYPE()
 			TYPE();
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows,1);
 	}
 }
@@ -326,8 +328,10 @@ void RETURNED_TYPE()
 /* PARAM_DEFINITIONS -> ε | VAR_DEFINITIONS */
 void PARAM_DEFINITIONS()
 {	
-	curr_token = next_token();
 	eTOKENS follows[1] = {TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[3] = {TOKEN_KEYWORD_INTEGER, TOKEN_KEYWORD_REAL, TOKEN_RIGHT_BRACKET3};
+
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_KEYWORD_INTEGER:
@@ -341,7 +345,7 @@ void PARAM_DEFINITIONS()
 			output("PARAM_DEFINITIONS -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows,1);
 	}
 }
@@ -360,8 +364,10 @@ void STATEMENTS()
 /* STATEMENTS_TEMP -> STATEMENTS | ε */
 void STATEMENTS_TEMP()
 {
-	curr_token = next_token();
 	eTOKENS follows[2] = {TOKEN_KEYWORD_END, TOKEN_RIGHT_BRACKET2};
+	eTOKENS expected[5] = {TOKEN_KEYWORD_RETURN, TOKEN_ID, TOKEN_LEFT_BRACKET2, TOKEN_KEYWORD_END, TOKEN_RIGHT_BRACKET2};
+	
+	curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_KEYWORD_RETURN:
@@ -377,7 +383,7 @@ void STATEMENTS_TEMP()
 			output("STATEMENTS_TEMP -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 2);
 	}
 }
@@ -386,6 +392,8 @@ void STATEMENTS_TEMP()
 void STATEMENT()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
+	eTOKENS expected[3] = {TOKEN_KEYWORD_RETURN, TOKEN_LEFT_BRACKET2, TOKEN_ID};
+
 	curr_token = next_token();
 	if (curr_token->kind == TOKEN_SEMICOLON)
 		curr_token = next_token();
@@ -405,10 +413,9 @@ void STATEMENT()
 			output("STATEMENT -> id STATEMENT_TWO_TEMP");
 			match(TOKEN_ID);
 			STATEMENT_TWO_TEMP();
-
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -417,6 +424,8 @@ void STATEMENT()
 void STATEMENT_TEMP()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
+	eTOKENS expected[4] = {TOKEN_INT_NUMBER, TOKEN_ID, TOKEN_REAL_NUMBER, TOKEN_SEMICOLON};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -429,10 +438,10 @@ void STATEMENT_TEMP()
 			break;
 		case TOKEN_SEMICOLON:
 			curr_token = back_token();
-			output("STATEMENT_TEMP -> EXPRESSION");
+			output("STATEMENT_TEMP -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -441,6 +450,8 @@ void STATEMENT_TEMP()
 void STATEMENT_TWO_TEMP()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
+	eTOKENS expected[3] = {TOKEN_LEFT_BRACKET3, TOKEN_OP_EQUAL, TOKEN_LEFT_BRACKET1};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -461,7 +472,7 @@ void STATEMENT_TWO_TEMP()
 			EXPRESSION();
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -471,7 +482,7 @@ void BLOCK()
 {
 	eTOKENS follows[4] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_EOF};
 	curr_token = next_token();
-	output("BLOCK -> { VAR_DEFINITIONS; STATEMENTS");
+	output("BLOCK -> { VAR_DEFINITIONS; STATEMENTS }");
 
 	match(TOKEN_LEFT_BRACKET2);
 	VAR_DEFINITIONS();
@@ -483,7 +494,6 @@ void BLOCK()
 }
 
 /* FUNCTION_CALL -> id (PARAMETERS_LIST) */
-// ========================================================= TODO
 void FUNCTION_CALL()
 {
 	eTOKENS follows[4] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_EOF};
@@ -502,6 +512,8 @@ void FUNCTION_CALL()
 void PARAMETERS_LIST()
 {
 	eTOKENS follows[1] = {TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[2] = {TOKEN_ID, TOKEN_RIGHT_BRACKET3};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -515,7 +527,7 @@ void PARAMETERS_LIST()
 			output("PARAMETERS_LIST -> ε");
 			break;
 		default:
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 
 	}
@@ -525,6 +537,8 @@ void PARAMETERS_LIST()
 void EXPRESSION()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
+	eTOKENS expected[3] = {TOKEN_INT_NUMBER, TOKEN_REAL_NUMBER, TOKEN_ID};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -542,7 +556,7 @@ void EXPRESSION()
 			EXPRESSION_TEMP();
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -551,6 +565,8 @@ void EXPRESSION()
 void EXPRESSION_TEMP()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
+	eTOKENS expected[3] = {TOKEN_LEFT_BRACKET1, TOKEN_OP_MUL, TOKEN_OP_DIV};
+
 	curr_token = next_token();
 	switch(curr_token->kind)
 	{
@@ -570,7 +586,7 @@ void EXPRESSION_TEMP()
 			EXPRESSION();
 			break;
 		default: 
-			error();
+			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
 	}
 }
@@ -580,7 +596,6 @@ char *concatenate(size_t size, eTOKENS *array, const char *joint){
     size_t jlen, lens[size];
     size_t i, total_size = (size-1) * (jlen=strlen(joint)) + 1;
     char *result, *p;
-
 
     for(i=0;i<size;++i){
         total_size += (lens[i]=strlen(token_kinds[array[i]]));
@@ -594,6 +609,7 @@ char *concatenate(size_t size, eTOKENS *array, const char *joint){
             p += jlen;
         }
     }
+
     *p = '\0';
-    return result;
+	return result;
 }

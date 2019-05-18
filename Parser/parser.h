@@ -9,8 +9,7 @@
 extern FILE *parser_out;
 extern int debug;
 
-// void error(eTOKENS expected[]);
-void error();
+void error(eTOKENS expected[], int size);
 int match(eTOKENS token);
 void parser();
 void output(char* rule);
