@@ -52,9 +52,12 @@ void error()
 
 void recover(eTOKENS follows[], int size)
 {
-	do {
-		curr_token = next_token();
-	} while(contains_in(follows, curr_token->kind, size) == FAIL);
+	if (debug == 1)
+		printf("recover\n");	
+	else
+		fprintf(parser_out, "recover\n");	// do {
+	// 	curr_token = next_token();
+	// } while(contains_in(follows, curr_token->kind, size) == FAIL);
 	
 }
 
@@ -83,13 +86,14 @@ void PROGRAM()
 	int follows[1] = {TOKEN_EOF};
 	int size = 1;
 
-	curr_token = next_token();
 	output("PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS");
-
+	curr_token = next_token();
 	match(TOKEN_KEYWORD_PROGRAM);
 	VAR_DEFINITIONS();
+	curr_token = next_token();
 	match(TOKEN_SEMICOLON);
 	STATEMENTS();
+	curr_token = next_token();
 	match(TOKEN_KEYWORD_END);
 	FUNC_DEFINITIONS();
 }
@@ -108,14 +112,27 @@ void VAR_DEFINITIONS()
 /* VAR_DEFINITIONS_TEMP -> ;VAR_DEFINITIONS | ε */
 void VAR_DEFINITIONS_TEMP()
 {
+	// output("======= IN VAR DEFS TEMP =========");
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	curr_token = next_token();
+	Token* peek_token = NULL;
+
 	switch(curr_token->kind)
 	{
 		case TOKEN_SEMICOLON:
-			output("VAR_DEFINITIONS_TEMP -> ;VAR_DEFINITIONS");
-			match(TOKEN_SEMICOLON);
-			VAR_DEFINITIONS();
+			// output("=============== peek ===========");
+			peek_token = peek();
+			if (peek_token->kind == TOKEN_KEYWORD_INTEGER || peek_token->kind == TOKEN_KEYWORD_REAL)
+			{
+				output("VAR_DEFINITIONS_TEMP -> ;VAR_DEFINITIONS");
+				VAR_DEFINITIONS();
+			}
+			else 
+			{
+				// output("=============== else ===========");
+				curr_token = back_token();
+				output("VAR_DEFINITIONS_TEMP -> ε");
+			}
 			break;
 		case TOKEN_RIGHT_BRACKET3:
 			curr_token = back_token();
@@ -175,7 +192,7 @@ void VARIABLES_LIST_TEMP()
 
 	switch(curr_token->kind)
 	{
-		case TOKEN_COMMA:
+		case TOKEN_COMMA:	
 			output("VARIABLES_LIST_TEMP -> ,VARIABLE VARIABLES_LIST_TEMP");
 			match(TOKEN_COMMA);
 			VARIABLE();
@@ -274,9 +291,12 @@ void FUNC_DEFINITION()
 
 	output("FUNC_DEFINITION -> RETURNED_TYPE id (PARAM_DEFINITIONS) BLOCK");
 	RETURNED_TYPE();
+	curr_token = next_token();
 	match(TOKEN_ID);
+	curr_token = next_token();
 	match(TOKEN_LEFT_BRACKET3);
 	PARAM_DEFINITIONS();
+	curr_token = next_token();
 	match(TOKEN_RIGHT_BRACKET3);
 	BLOCK();
 }
@@ -333,8 +353,9 @@ void STATEMENTS()
 	eTOKENS follows[2] = {TOKEN_KEYWORD_END, TOKEN_RIGHT_BRACKET2};
 	output("STATEMENTS -> STATEMENT; STATEMENTS_TEMP");
 	STATEMENT();
+	curr_token = next_token();
 	match(TOKEN_SEMICOLON);
-	STATEMENT_TEMP();
+	STATEMENTS_TEMP();
 }
 
 /* STATEMENTS_TEMP -> STATEMENTS | ε */
@@ -367,6 +388,8 @@ void STATEMENT()
 {
 	eTOKENS follows[1] = {TOKEN_SEMICOLON};
 	curr_token = next_token();
+	if (curr_token->kind == TOKEN_SEMICOLON)
+		curr_token = next_token();
 	switch(curr_token->kind)
 	{
 		case TOKEN_KEYWORD_RETURN:
@@ -383,6 +406,7 @@ void STATEMENT()
 			output("STATEMENT -> id STATEMENT_TWO_TEMP");
 			match(TOKEN_ID);
 			STATEMENT_TWO_TEMP();
+
 			break;
 		default: 
 			error();
@@ -425,6 +449,7 @@ void STATEMENT_TWO_TEMP()
 			output("STATEMENT_TWO_TEMP -> (PARAMETERS_LIST)");
 			match(TOKEN_LEFT_BRACKET3);
 			PARAMETERS_LIST();
+			curr_token = next_token();
 			match(TOKEN_RIGHT_BRACKET3);
 			break;
 		case TOKEN_OP_EQUAL:
@@ -432,6 +457,7 @@ void STATEMENT_TWO_TEMP()
 			curr_token = back_token();
 			output("STATEMENT_TWO_TEMP -> VARIABLE_TEMP = EXPRESSION");
 			VARIABLE_TEMP();
+			curr_token = next_token();
 			match(TOKEN_OP_EQUAL);
 			EXPRESSION();
 			break;
@@ -450,8 +476,10 @@ void BLOCK()
 
 	match(TOKEN_LEFT_BRACKET2);
 	VAR_DEFINITIONS();
+	curr_token = next_token();
 	match(TOKEN_SEMICOLON);
 	STATEMENTS();
+	curr_token = next_token();
 	match(TOKEN_RIGHT_BRACKET2);
 }
 
@@ -464,8 +492,10 @@ void FUNCTION_CALL()
 	output("FUNCTION_CALL -> id (PARAMETERS_LIST");
 
 	match(TOKEN_ID);
+	curr_token = next_token();
 	match(TOKEN_LEFT_BRACKET3);
 	PARAMETERS_LIST();
+	curr_token = next_token();
 	match(TOKEN_RIGHT_BRACKET3);
 }
 

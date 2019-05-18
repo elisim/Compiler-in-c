@@ -134,10 +134,6 @@ Token *next_token()
 				currentNode = currentNode->next;
 				currentIndex = 0;
 			}
-			// else if (currentNode->tokensArray[currentIndex+1] != NULL)
-			// {
-			// 	currentIndex++;
-			// }
 			else
 			{
 				currentIndex++;
@@ -160,4 +156,11 @@ Token *next_token()
 	    getchar();	
 	}
     return ans;
+}
+
+Token* peek()
+{
+	Token *ans = next_token();
+	back_token();
+	return ans;
 }

@@ -41,9 +41,11 @@ int main(int argc, char** argv)
    else
        yyin = stdin;
 
+   if (debug == 0)
+    {
    parser_out = fopen("parse.txt", "w");
+   }
    yyout = fopen("scanner.txt", "w");
-
    parser();
 
    printf("DONE\n");
