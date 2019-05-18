@@ -6,8 +6,6 @@
 /*
 TODO: 
 1. match: when error, recover
-2. rule FUNCTION CALL
-3. VARIABLE_DEFITINIOS_TEMP first and follow not disjoint
 4. error msg
 5. files to output
 */
@@ -33,9 +31,8 @@ int match(eTOKENS token)
 	}
 }
 
-// void error()
+// void error(eTOKENS expected[])
 // {
-// 	eTOKENS expected[] = {TOKEN_RIGHT_BRACKET3};
 // 	int size = sizeof(expected)/sizeof(expected[0]);
 // 	char *expected_str = concatenate(size, expected, " or ");
 // 	fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'", 
@@ -52,12 +49,14 @@ void error()
 
 void recover(eTOKENS follows[], int size)
 {
-	if (debug == 1)
-		printf("recover\n");	
-	else
-		fprintf(parser_out, "recover\n");	// do {
-	// 	curr_token = next_token();
-	// } while(contains_in(follows, curr_token->kind, size) == FAIL);
+	// if (debug == 1)
+	// 	printf("recover\n");	
+	// else
+	// 	fprintf(parser_out, "recover\n");	
+
+	do {
+		curr_token = next_token();
+	} while(contains_in(follows, curr_token->kind, size) == FAIL);
 	
 }
 

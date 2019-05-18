@@ -5,17 +5,16 @@
 #define SUCCESS 0
 #define FAIL 1
 
-#include "tokens_names.h"
 
 extern FILE *parser_out;
 extern int debug;
 
+// void error(eTOKENS expected[]);
 void error();
 int match(eTOKENS token);
 void parser();
 void output(char* rule);
 int contains_in(eTOKENS arr[], eTOKENS token, int size);
-// int recover(eTOKENS follows[], int size);
 char *concatenate(size_t size, eTOKENS *array, const char *joint);
 
 
