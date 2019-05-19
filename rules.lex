@@ -28,16 +28,30 @@ program|end|real|integer|void|return 	return keyword_action(TOKEN_KEYWORD, yytex
 
 int main(int argc, char** argv)
 {
-	printf("Start running scanner\n");
-	yyin = fopen("ass2_test.txt", "r");
-  parser_out = fopen("parse.txt", "w");
-  yyout = fopen("scanner.txt", "w");
+  int test;
+  char filename[100]={0};
+  eTOKENS kind;
 
-  parser();
+  for(test = 1 ; test <= 2 ; test++)
+  {
+    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,".txt");
+    // yyin = fopen(filename,"r");
+    printf("input: %s\n", filename);
 
+    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_lex.txt");
+    // yyout = fopen(filename,"w");
+    printf("lex output: %s\n", filename);
+
+    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_syntactic.txt");    
+    // parser_out = fopen(filename, "w");
+    printf("syntactic output: %s\n", filename);
+    
+    // parser();
+
+    // fclose(yyin);
+    // fclose(yyout);
+    // fclose(parser_out);
+
+  }
   printf("DONE\n");
-  fclose(yyin);
-  fclose(yyout);
-  fclose(parser_out);
-  return 0;
 }
