@@ -7,7 +7,6 @@
 
 extern FILE *yyin, *yyout;
 extern int yylex();
-extern int debug;
 
 static const char* token_kinds[] = 
 {

@@ -6,7 +6,6 @@
 #include "Actions/actions.h"
 #include "Parser/parser.h"
 FILE *parser_out = NULL;
-int debug = 0;
 %}
 
 DIGIT	  [1-9]
@@ -30,27 +29,15 @@ program|end|real|integer|void|return 	return keyword_action(TOKEN_KEYWORD, yytex
 int main(int argc, char** argv)
 {
 	printf("Start running scanner\n");
-   ++argv, --argc;	/* skip over program name */
+	yyin = fopen("ass2_test.txt", "r");
+  parser_out = fopen("parse.txt", "w");
+  yyout = fopen("scanner.txt", "w");
 
-   if (argc >= 1)
-   {
-		 yyin = fopen(argv[0], "r");
-     if (argc == 2)
-         debug = 1;
-   }
-   else
-       yyin = stdin;
+  parser();
 
-   if (debug == 0)
-    {
-   parser_out = fopen("parse.txt", "w");
-   }
-   yyout = fopen("scanner.txt", "w");
-   parser();
-
-   printf("DONE\n");
-   fclose(yyin);
-   fclose(yyout);
-   fclose(parser_out);
-   return 0;
+  printf("DONE\n");
+  fclose(yyin);
+  fclose(yyout);
+  fclose(parser_out);
+  return 0;
 }

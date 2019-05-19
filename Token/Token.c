@@ -103,17 +103,7 @@ Token *back_token()
 		currentIndex--;	
 	}
 	
-	Token *ans = &(currentNode->tokensArray[currentIndex]);
-	if (debug == 1)
-	{
-		printf("==== back token ====\n");
-		printf("kind = %s\n", token_kinds[ans->kind]);
-	   	printf("lexeme = %s\n", ans->lexeme);
-	   	printf("line = %d\n",  ans->lineNumber);
-	    printf("OK?\n");
-	    getchar();	
-	}
-    return ans;
+	return &(currentNode->tokensArray[currentIndex]);
 }
 
 /*
@@ -145,17 +135,7 @@ Token *next_token()
 		yylex();
 	}
 	
-	Token *ans = &(currentNode->tokensArray[currentIndex]);
-	if (debug == 1)
-	{
-		printf("==== next token ====\n");
-		printf("kind = %s\n", token_kinds[ans->kind]);
-	   	printf("lexeme = %s\n", ans->lexeme);
-	   	printf("line = %d\n",  ans->lineNumber);
-	    printf("OK?\n");
-	    getchar();	
-	}
-    return ans;
+	return &(currentNode->tokensArray[currentIndex]);
 }
 
 Token* peek()

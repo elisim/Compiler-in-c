@@ -572,22 +572,13 @@ void error(eTOKENS expected[], int size)
 	else
 		strcpy(expected_str, concatenate(size, expected, " or "));
 
-	if (debug == 1)
-		printf("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
-				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
-	else
-		fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
-				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
+	fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+			expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 }
 
 
 void recover(eTOKENS follows[], int size)
 {
-	if (debug == 1)
-		printf("recover\n");	
-	else
-		fprintf(parser_out, "recover\n");	
-
 	do {
 		curr_token = next_token();
 	} while(contains_in(follows, curr_token->kind, size) == FAIL);
@@ -607,8 +598,5 @@ int contains_in(eTOKENS arr[], eTOKENS token, int size)
 
 void output(char* rule)
 {
-	if (debug == 1)
-		printf("Rule(%s)\n", rule);
-	else
-		fprintf(parser_out, "Rule(%s)\n", rule);
+	fprintf(parser_out, "Rule(%s)\n", rule);
 }

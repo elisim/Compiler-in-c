@@ -5,9 +5,8 @@
 #define SUCCESS 0
 #define FAIL 1
 
-
 extern FILE *parser_out;
-extern int debug;
+
 
 void error(eTOKENS expected[], int size);
 int match(eTOKENS token);
