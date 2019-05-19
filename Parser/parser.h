@@ -15,7 +15,7 @@ void parser();
 void output(char* rule);
 int contains_in(eTOKENS arr[], eTOKENS token, int size);
 char *concatenate(size_t size, eTOKENS *array, const char *joint);
-
+void recover(eTOKENS follows[], int size);
 
 /* === Parsing Functions === */
 void PROGRAM();

@@ -3,12 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/*
-TODO: 
-1. match: when error, recover
-5. files to output
-*/
-
 Token *curr_token = NULL;
 
 void parser()
@@ -17,7 +11,6 @@ void parser()
    	match(TOKEN_EOF);
 }
 
-/* match and go to next token */
 int match(eTOKENS token)
 {
 	if (curr_token->kind != token)
@@ -28,50 +21,6 @@ int match(eTOKENS token)
 	{
 		return SUCCESS;
 	}
-}
-
-void error(eTOKENS expected[], int size)
-{
-	char *expected_str = concatenate(size, expected, " or ");
-	if (debug == 1)
-		printf("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
-				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
-	else
-		fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
-				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
-}
-
-
-void recover(eTOKENS follows[], int size)
-{
-	if (debug == 1)
-		printf("recover\n");	
-	else
-		fprintf(parser_out, "recover\n");	
-
-	do {
-		curr_token = next_token();
-	} while(contains_in(follows, curr_token->kind, size) == FAIL);
-	
-}
-
-int contains_in(eTOKENS arr[], eTOKENS token, int size)
-{
-	int i;
-	for(i=0; i<size; i++)
-	{
-		if (arr[i] == token)
-			return SUCCESS;
-	}
-	return FAIL;
-}
-
-void output(char* rule)
-{
-	if (debug == 1)
-		printf("Rule(%s)\n", rule);
-	else
-		fprintf(parser_out, "Rule(%s)\n", rule);
 }
 
 /* PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS */
@@ -612,4 +561,54 @@ char *concatenate(size_t size, eTOKENS *array, const char *joint){
 
     *p = '\0';
 	return result;
+}
+
+
+void error(eTOKENS expected[], int size)
+{
+	char expected_str[100] = "";
+	if (size == 1)
+		strcpy(expected_str, token_kinds[expected[0]]);
+	else
+		strcpy(expected_str, concatenate(size, expected, " or "));
+
+	if (debug == 1)
+		printf("Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
+	else
+		fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+				expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
+}
+
+
+void recover(eTOKENS follows[], int size)
+{
+	if (debug == 1)
+		printf("recover\n");	
+	else
+		fprintf(parser_out, "recover\n");	
+
+	do {
+		curr_token = next_token();
+	} while(contains_in(follows, curr_token->kind, size) == FAIL);
+	
+}
+
+int contains_in(eTOKENS arr[], eTOKENS token, int size)
+{
+	int i;
+	for(i=0; i<size; i++)
+	{
+		if (arr[i] == token)
+			return SUCCESS;
+	}
+	return FAIL;
+}
+
+void output(char* rule)
+{
+	if (debug == 1)
+		printf("Rule(%s)\n", rule);
+	else
+		fprintf(parser_out, "Rule(%s)\n", rule);
 }
