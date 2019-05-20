@@ -7,6 +7,7 @@ Token *curr_token = NULL;
 
 void parser()
 {
+	curr_token = NULL;
 	PROGRAM();
    	match(TOKEN_EOF);
 }
@@ -30,15 +31,18 @@ void PROGRAM()
 	int size = 1;
 
 	output("PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS");
+
 	curr_token = next_token();
 	match(TOKEN_KEYWORD_PROGRAM);
 	VAR_DEFINITIONS();
 	curr_token = next_token();
 	match(TOKEN_SEMICOLON);
 	STATEMENTS();
+
 	curr_token = next_token();
 	match(TOKEN_KEYWORD_END);
 	FUNC_DEFINITIONS();
+	
 }
 
 

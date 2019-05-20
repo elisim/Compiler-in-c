@@ -129,6 +129,10 @@ Token *next_token()
 				currentIndex++;
 			}
 		}
+		else
+		{
+			yylex();
+		}
 	}
 	else
 	{
@@ -143,4 +147,35 @@ Token* peek()
 	Token *ans = next_token();
 	back_token();
 	return ans;
+}
+
+void clean_stored_tokes()
+{
+	Node* curr = currentNode;
+	Node* temp = NULL;
+	while (curr != NULL)
+	{
+		temp = curr->next;
+		free_tokens(curr->tokensArray);
+		free(curr);
+		curr = temp;
+	}
+	currentNode = NULL;
+	currentIndex = 0;
+	int back = 0;
+}
+
+void free_tokens(Token* tokens)
+{
+	int i;
+	for (i=0; i<TOKEN_ARRAY_SIZE; i++)
+	{
+		char *lexeme = tokens[i].lexeme;
+		if (lexeme)
+		{
+			// printf("lexeme: %s\n", lexeme);
+			free(lexeme);
+		}
+	}
+	free(tokens);
 }

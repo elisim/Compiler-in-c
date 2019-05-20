@@ -34,24 +34,27 @@ int main(int argc, char** argv)
 
   for(test = 1 ; test <= 2 ; test++)
   {
-    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,".txt");
-    // yyin = fopen(filename,"r");
-    printf("input: %s\n", filename);
+    //sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,".txt");
+    sprintf(filename,"%s%d%s","in//test",test,".txt");
+    yyin = fopen(filename,"r");
 
-    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_lex.txt");
-    // yyout = fopen(filename,"w");
-    printf("lex output: %s\n", filename);
+    // sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_lex.txt");
+    sprintf(filename,"%s%d%s","out//test",test,"_301606810_302677463_lex.txt");
+    yyout = fopen(filename,"w");
 
-    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_syntactic.txt");    
-    // parser_out = fopen(filename, "w");
-    printf("syntactic output: %s\n", filename);
-    
-    // parser();
-
-    // fclose(yyin);
-    // fclose(yyout);
-    // fclose(parser_out);
-
+    // sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_syntactic.txt");    
+    sprintf(filename,"%s%d%s","out//test",test,"_301606810_302677463_syntactic.txt");    
+    parser_out = fopen(filename, "w");
+    parser();
+    fclose(yyin);
+    fclose(yyout);
+    fclose(parser_out);
+    yyin = NULL;
+    yyout = NULL;
+    parser_out = NULL;
+    yylineno = 0;
+    clean_stored_tokes();
   }
   printf("DONE\n");
+  return 0;
 }
