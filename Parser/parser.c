@@ -1,4 +1,4 @@
-#include "parser.h"
+﻿#include "parser.h"
 #include "../Actions/actions.h"
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +9,7 @@ void parser()
 {
 	curr_token = NULL;
 	PROGRAM();
+	curr_token = next_token();
    	match(TOKEN_EOF);
 }
 
@@ -16,6 +17,10 @@ int match(eTOKENS token)
 {
 	if (curr_token->kind != token)
 	{
+		char expected_str[100] = "";
+		strcpy(expected_str, token_kinds[token]);
+		fprintf(parser_out, "Expected: token '%s' at line: %d, Actual token: '%s', lexeme: '%s'\n", 
+			expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 		return FAIL;
 	}
 	else 
@@ -49,10 +54,23 @@ void PROGRAM()
 /* VAR_DEFINITIONS -> VAR_DEFINITION VAR_DEFINITIONS_TEMP */
 void VAR_DEFINITIONS()
 {
-	output("VAR_DEFINITIONS -> VAR_DEFINITION VAR_DEFINITIONS_TEMP");
+	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[4] = {TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	curr_token = next_token();
+	switch(curr_token->kind)
+	{
+		case TOKEN_KEYWORD_REAL:
+		case TOKEN_KEYWORD_INTEGER:
+			output("VAR_DEFINITIONS -> VAR_DEFINITION VAR_DEFINITIONS_TEMP");
+			curr_token = back_token();
+			VAR_DEFINITION(); 
+			VAR_DEFINITIONS_TEMP();
+			break;
 
-	VAR_DEFINITION(); 
-	VAR_DEFINITIONS_TEMP();
+		default:
+			recover(follows, 2);
+			error(expected, sizeof(expected)/sizeof(expected[0]));
+	}
 }
 
 
@@ -92,10 +110,25 @@ void VAR_DEFINITIONS_TEMP()
 /* VAR_DEFINITION -> TYPE VARIABLES_LIST */
 void VAR_DEFINITION()
 {
-	output("VAR_DEFINITION -> TYPE VARIABLES_LIST");
+	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[4] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER};
+	
+	curr_token = next_token();
 
-	TYPE();
-	VARIABLES_LIST();
+	switch(curr_token->kind)
+	{
+		case TOKEN_KEYWORD_REAL:
+		case TOKEN_KEYWORD_INTEGER:
+			output("VAR_DEFINITION -> TYPE VARIABLES_LIST");
+			curr_token = back_token();
+			TYPE();
+			VARIABLES_LIST();
+			break;
+
+		default:
+			error(expected, sizeof(expected)/sizeof(expected[0]));
+			recover(follows, 2);
+	}
 }
 
 
@@ -125,9 +158,22 @@ void TYPE()
 /* VARIABLES_LIST -> VARIABLE VARIABLES_LIST_TEMP */
 void VARIABLES_LIST() 
 {
-	output("VARIABLES_LIST -> VARIABLE VARIABLES_LIST_TEMP");
-	VARIABLE();
-	VARIABLES_LIST_TEMP();
+	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[3] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3, TOKEN_ID};
+
+	curr_token = next_token();
+	if (curr_token->kind == TOKEN_ID)
+	{
+		output("VARIABLES_LIST -> VARIABLE VARIABLES_LIST_TEMP");	
+		curr_token = back_token(); 
+		VARIABLE();
+		VARIABLES_LIST_TEMP();
+	}
+	else
+	{
+		error(expected, sizeof(expected)/sizeof(expected[0]));
+		recover(follows, 2);	
+	}
 }
 
 
@@ -161,11 +207,19 @@ void VARIABLES_LIST_TEMP()
 void VARIABLE()
 {
 	eTOKENS follows[3] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
+	eTOKENS expected[4] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3,  TOKEN_ID};
 	curr_token = next_token();
-	output("VARIABLE -> id VARIABLE_TEMP");
 
-	match(TOKEN_ID);
-	VARIABLE_TEMP();
+	if (curr_token->kind == TOKEN_ID)
+	{
+		output("VARIABLE -> id VARIABLE_TEMP");
+		VARIABLE_TEMP();
+	}
+	else
+	{
+		error(expected, sizeof(expected)/sizeof(expected[0]));
+		recover(follows, 3);	
+	}
 }
 
 /* VARIABLE_TEMP -> [int_number] | ε */
@@ -201,11 +255,27 @@ void VARIABLE_TEMP()
 /* FUNC_DEFINITIONS -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP */
 void FUNC_DEFINITIONS()
 {
-	output("FUNC_DEFINITIONS -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP");
+	eTOKENS follows[1] = {TOKEN_EOF};
+	eTOKENS expected[4] = {TOKEN_KEYWORD_VOID,TOKEN_KEYWORD_REAL,TOKEN_KEYWORD_INTEGER, TOKEN_EOF};
+	curr_token = next_token();
 
-	FUNC_DEFINITION();
-	FUNC_DEFINITIONS_TEMP();
+	switch(curr_token->kind)
+	{
+		case TOKEN_KEYWORD_REAL:
+		case TOKEN_KEYWORD_INTEGER:
+		case TOKEN_KEYWORD_VOID:
+			output("FUNC_DEFINITIONS -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP");
+			curr_token = back_token();
+			FUNC_DEFINITION();
+			FUNC_DEFINITIONS_TEMP();
+			break;
+
+		default:
+			error(expected, sizeof(expected)/sizeof(expected[0]));
+			recover(follows, 1);
+	}
 }
+
 
 /* FUNC_DEFINITIONS_TEMP -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP | ε */
 void FUNC_DEFINITIONS_TEMP()
@@ -307,12 +377,26 @@ void PARAM_DEFINITIONS()
 void STATEMENTS()
 {
 	eTOKENS follows[2] = {TOKEN_KEYWORD_END, TOKEN_RIGHT_BRACKET2};
-	output("STATEMENTS -> STATEMENT; STATEMENTS_TEMP");
-	STATEMENT();
+	eTOKENS expected[5] = {TOKEN_KEYWORD_END, TOKEN_RIGHT_BRACKET2, TOKEN_ID, TOKEN_LEFT_BRACKET2, TOKEN_KEYWORD_RETURN};
 	curr_token = next_token();
-	match(TOKEN_SEMICOLON);
-	STATEMENTS_TEMP();
+	switch(curr_token->kind)
+	{
+		case TOKEN_ID:
+		case TOKEN_LEFT_BRACKET2:
+		case TOKEN_KEYWORD_RETURN:
+			output("STATEMENTS -> STATEMENT; STATEMENTS_TEMP");
+			curr_token = back_token();
+			STATEMENT();
+			curr_token = next_token();
+			match(TOKEN_SEMICOLON);
+			STATEMENTS_TEMP();
+			break;
+		default:
+			error(expected, sizeof(expected)/sizeof(expected[0]));
+			recover(follows,2);
+	}
 }
+
 
 /* STATEMENTS_TEMP -> STATEMENTS | ε */
 void STATEMENTS_TEMP()
@@ -434,17 +518,27 @@ void STATEMENT_TWO_TEMP()
 void BLOCK()
 {
 	eTOKENS follows[4] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_EOF};
-	curr_token = next_token();
-	output("BLOCK -> { VAR_DEFINITIONS; STATEMENTS }");
+	eTOKENS expected[5] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER, TOKEN_EOF, TOKEN_LEFT_BRACKET2};
 
-	match(TOKEN_LEFT_BRACKET2);
-	VAR_DEFINITIONS();
 	curr_token = next_token();
-	match(TOKEN_SEMICOLON);
-	STATEMENTS();
-	curr_token = next_token();
-	match(TOKEN_RIGHT_BRACKET2);
+	switch(curr_token->kind)
+	{
+		case TOKEN_LEFT_BRACKET2:
+			output("BLOCK -> { VAR_DEFINITIONS; STATEMENTS }");
+			match(TOKEN_LEFT_BRACKET2);
+			VAR_DEFINITIONS();
+			curr_token = next_token();
+			match(TOKEN_SEMICOLON);
+			STATEMENTS();
+			curr_token = next_token();
+			match(TOKEN_RIGHT_BRACKET2);
+			break;
+		default:
+			error(expected, sizeof(expected)/sizeof(expected[0]));
+			recover(follows, 4);
+	}
 }
+
 
 /* FUNCTION_CALL -> id (PARAMETERS_LIST) */
 void FUNCTION_CALL()
@@ -534,7 +628,7 @@ void EXPRESSION_TEMP()
 			EXPRESSION();
 			break;
 		case TOKEN_OP_DIV: 
-			match(TOKEN_OP_MUL);
+			match(TOKEN_OP_DIV);
 			output("EXPRESSION_TEMP -> ar_op EXPRESSION");
 			EXPRESSION();
 			break;
@@ -576,17 +670,31 @@ void error(eTOKENS expected[], int size)
 	else
 		strcpy(expected_str, concatenate(size, expected, " or "));
 
-	fprintf(parser_out, "Expected token of type '%s' at line: %d, Actual token of type '%s', lexeme: '%s'\n", 
+	fprintf(parser_out, "Expected: one of tokens '%s' at line: %d, Actual token: '%s', lexeme: '%s'\n", 
 			expected_str, curr_token->lineNumber, token_kinds[curr_token->kind], curr_token->lexeme);
 }
 
 
 void recover(eTOKENS follows[], int size)
 {
-	do {
-		curr_token = next_token();
-	} while(contains_in(follows, curr_token->kind, size) == FAIL);
-	
+	Token *token = back_token();
+	int found = 0;
+	int i; 
+	while (found == 0){
+		token = next_token();
+		if (token->kind == TOKEN_EOF){
+			exit(0);
+		}
+		else{
+			for (i = 0; i < size; i++){
+				if (follows[i] == token->kind){
+					found = 1;
+					back_token();
+					break;
+				}
+			}
+		}
+	}	
 }
 
 int contains_in(eTOKENS arr[], eTOKENS token, int size)

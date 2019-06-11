@@ -173,9 +173,10 @@ void free_tokens(Token* tokens)
 		char *lexeme = tokens[i].lexeme;
 		if (lexeme)
 		{
-			// printf("lexeme: %s\n", lexeme);
 			free(lexeme);
+			lexeme = NULL;
 		}
 	}
 	free(tokens);
+	tokens = NULL;
 }
