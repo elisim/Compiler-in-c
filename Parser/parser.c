@@ -682,12 +682,16 @@ void recover(eTOKENS follows[], int size)
 	int i; 
 	while (found == 0){
 		token = next_token();
-		if (token->kind == TOKEN_EOF){
+		if (token->kind == TOKEN_EOF)
+		{
 			exit(0);
 		}
-		else{
-			for (i = 0; i < size; i++){
-				if (follows[i] == token->kind){
+		else
+		{
+			for (i = 0; i < size; i++)
+			{
+				if (follows[i] == token->kind)
+				{
 					found = 1;
 					back_token();
 					break;

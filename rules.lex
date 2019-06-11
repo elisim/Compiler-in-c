@@ -28,33 +28,15 @@ program|end|real|integer|void|return 	return keyword_action(TOKEN_KEYWORD, yytex
 
 int main(int argc, char** argv)
 {
-  int test;
-  char filename[100]={0};
-  eTOKENS kind;
+  printf("Start running scanner\n");
+  yyin = fopen("bad.txt", "r");
+  parser_out = fopen("parse.txt", "w");
+  yyout = fopen("scanner.txt", "w");
 
-  for(test = 1 ; test <= 2 ; test++)
-  {
-    //sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,".txt");
-    sprintf(filename,"%s%d%s","in//test",test,".txt");
-    yyin = fopen(filename,"r");
+  parser();
 
-    // sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_lex.txt");
-    sprintf(filename,"%s%d%s","out//test",test,"_301606810_302677463_lex.txt");
-    yyout = fopen(filename,"w");
-
-    // sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_syntactic.txt");    
-    sprintf(filename,"%s%d%s","out//test",test,"_301606810_302677463_syntactic.txt");    
-    parser_out = fopen(filename, "w");
-    parser();
-    fclose(yyin);
-    fclose(yyout);
-    fclose(parser_out);
-    yyin = NULL;
-    yyout = NULL;
-    parser_out = NULL;
-    yylineno = 0;
-    clean_stored_tokes();
-  }
-  printf("DONE\n");
+  fclose(yyin);
+  fclose(yyout);
+  fclose(parser_out);
   return 0;
 }
