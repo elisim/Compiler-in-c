@@ -43,7 +43,6 @@ void PROGRAM()
 	curr_token = next_token();
 	match(TOKEN_SEMICOLON);
 	STATEMENTS();
-
 	curr_token = next_token();
 	match(TOKEN_KEYWORD_END);
 	FUNC_DEFINITIONS();
@@ -680,7 +679,8 @@ void recover(eTOKENS follows[], int size)
 	Token *token = back_token();
 	int found = 0;
 	int i; 
-	while (found == 0){
+	while (found == 0)
+	{
 		token = next_token();
 		if (token->kind == TOKEN_EOF)
 		{
