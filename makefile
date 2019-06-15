@@ -9,4 +9,4 @@ lin.lex.yy.c:
 
 #Clean the build directory	
 clean: 
-	rm -vf my_parser
+	rm -vf my_parser lin.lex.yy.c

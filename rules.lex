@@ -6,6 +6,7 @@
 #include "Actions/actions.h"
 #include "Parser/parser.h"
 FILE *parser_out = NULL;
+FILE *semantic_out = NULL;
 %}
 
 DIGIT	  [1-9]
@@ -43,14 +44,20 @@ int main(int argc, char** argv)
     sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_syntactic.txt");    
     parser_out = fopen(filename, "w");
 
+    sprintf(filename,"%s%d%s","//home//ubuntu//Documents//test",test,"_301606810_302677463_semantic.txt");    
+    semantic_out = fopen(filename, "w"); 
+
+
     parser();
 
     fclose(yyin);
     fclose(yyout);
     fclose(parser_out);
+    fclose(semantic_out);
     yyin = NULL;
     yyout = NULL;
     parser_out = NULL;
+    semantic_out = NULL;
     yylineno = 1;
     clean_stored_tokes();
   }
