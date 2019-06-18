@@ -1,3 +1,3 @@
 /*
-This files contain semantic erros strings
+This files contain semantic erros strings.
 */

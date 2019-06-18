@@ -1,3 +1,31 @@
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
+
+#include "elm_type.h"
+#define TABLE_SIZE 1024 
+
+/* 
+ID in the table;
+For variable, consider only var_type and var_size. 
+For function, consider the other fields.
+Use 'type' field to distinguish between variable and function. 
+*/
+typedef struct table_entry
+{
+	int type; 					  // 0 - variable, 1 - function
+	char name;		 		      // ID name
+
+	// variables
+	elm_type var_type;  	      // var type (integer, real)
+	int var_size;				  // var size (for arrays)
+
+	// functions
+	elm_type returned_value_type; // returned value type
+	table_entry *params; 		  // parameters list
+	int num_of_params;			  // parameters list length
+} table_entry;
+
+
 /*
 Called when entering into a nested block in the program; 
 creates symbol table for this block, and links it to the table of the current scope
@@ -42,3 +70,5 @@ Called when assignment is processed, for variables that appear in its left and r
 Returns variable's type (integer or real)
 */
 elm_type get_id_type (table_entry id_entry);
+
+#endif
