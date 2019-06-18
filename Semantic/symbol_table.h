@@ -41,7 +41,7 @@ table_ptr pop_table(table_ptr current_table);
 /*
 Called when a variable declaration is processed. 
 Inserts the variable name and type into symbol table of the current scope, and returns pointer to the new entry. 
-Before insertion, checks whether the  id_name  already appears in the current table (for this, uses function lookup). 
+Before insertion, checks whether the  id_name already appears in the current table (for this, uses function lookup). 
 If yes then returns NULL; this indicates to an error (duplicate declaration of the same name) that should be reported.
 */
 table_entry insert(table_ptr current_table, char *id_name);     

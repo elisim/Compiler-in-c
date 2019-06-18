@@ -2,13 +2,18 @@
 #include "../Actions/actions.h"
 #include <stdio.h>
 #include <string.h>
+#include "symbol_table.h"
+#include "element_type.h"
 
 Token *curr_token = NULL;
+table_ptr curr_table = NULL;
+
 
 void parser()
 {
 	curr_token = NULL;
 	PROGRAM();
+	assert(curr_table == NULL); // after parsing the program, curr_table should be NULL;
 	curr_token = next_token();
    	match(TOKEN_EOF);
 }
@@ -36,7 +41,7 @@ void PROGRAM()
 	int size = 1;
 
 	output("PROGRAM -> program VAR_DEFINITIONS; STATEMENTS end FUNC_DEFINITIONS");
-
+	curr_table = make_table(curr_table)
 	curr_token = next_token();
 	match(TOKEN_KEYWORD_PROGRAM);
 	VAR_DEFINITIONS();
@@ -46,7 +51,7 @@ void PROGRAM()
 	curr_token = next_token();
 	match(TOKEN_KEYWORD_END);
 	FUNC_DEFINITIONS();
-	
+	cur_table = pop_table(cur_table);
 }
 
 
@@ -120,8 +125,8 @@ void VAR_DEFINITION()
 		case TOKEN_KEYWORD_INTEGER:
 			output("VAR_DEFINITION -> TYPE VARIABLES_LIST");
 			curr_token = back_token();
-			TYPE();
-			VARIABLES_LIST();
+			elm_type var_type = TYPE();
+			VARIABLES_LIST(var_type);
 			break;
 
 		default:
@@ -132,7 +137,7 @@ void VAR_DEFINITION()
 
 
 /* TYPE -> real | integer */
-void TYPE()
+elm_type TYPE()
 {
 	eTOKENS follows[1] = {TOKEN_ID};
 	eTOKENS expected[2] = {TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER};
@@ -143,11 +148,11 @@ void TYPE()
 		case TOKEN_KEYWORD_REAL:
 			output("TYPE -> real");
 			match(TOKEN_KEYWORD_REAL);
-			break;
+			return REAL;
 		case TOKEN_KEYWORD_INTEGER: 
 			output("TYPE -> integer");
 			match(TOKEN_KEYWORD_INTEGER);
-			break;
+			return INTEGER;
 		default: 
 			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);
@@ -155,7 +160,7 @@ void TYPE()
 }
 
 /* VARIABLES_LIST -> VARIABLE VARIABLES_LIST_TEMP */
-void VARIABLES_LIST() 
+void VARIABLES_LIST(elm_type var_type) 
 {
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	eTOKENS expected[3] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3, TOKEN_ID};
@@ -165,8 +170,8 @@ void VARIABLES_LIST()
 	{
 		output("VARIABLES_LIST -> VARIABLE VARIABLES_LIST_TEMP");	
 		curr_token = back_token(); 
-		VARIABLE();
-		VARIABLES_LIST_TEMP();
+		VARIABLE(var_type);
+		VARIABLES_LIST_TEMP(var_type);
 	}
 	else
 	{
@@ -177,7 +182,7 @@ void VARIABLES_LIST()
 
 
 /* VARIABLES_LIST_TEMP -> ,VARIABLE VARIABLES_LIST_TEMP | ε */
-void VARIABLES_LIST_TEMP()
+void VARIABLES_LIST_TEMP(var_type)
 {
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	eTOKENS expected[3] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
@@ -323,7 +328,7 @@ void FUNC_DEFINITION()
 }
 
 /* RETURNED_TYPE  -> void | TYPE */
-void RETURNED_TYPE()
+elm_type RETURNED_TYPE()
 {
 	eTOKENS follows[1] = {TOKEN_ID};
 	eTOKENS expected[3] = {TOKEN_KEYWORD_VOID, TOKEN_KEYWORD_REAL, TOKEN_KEYWORD_INTEGER};
@@ -334,13 +339,12 @@ void RETURNED_TYPE()
 		case TOKEN_KEYWORD_VOID:
 			output("RETURNED_TYPE -> void");
 			match(TOKEN_KEYWORD_VOID);
-			break;
+			return VOID_T;
 		case TOKEN_KEYWORD_INTEGER: 
 		case TOKEN_KEYWORD_REAL:
 			curr_token = back_token();
 			output("RETURNED_TYPE -> TYPE");
-			TYPE();
-			break;
+			return TYPE();
 		default: 
 			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows,1);

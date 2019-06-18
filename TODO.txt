@@ -1,0 +1,2 @@
+1. output to semantic_out (in symbol table include it and parser)
+2. Change assertion after parsing program to error

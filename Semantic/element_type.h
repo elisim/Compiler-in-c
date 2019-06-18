@@ -4,16 +4,16 @@
 /* ID Type */
 typedef enum elm_type
 {
-	Real,
-	Integer,
-	Void 	// for function returned type
+	REAL,
+	INTEGER,
+	VOID_T 	// for function returned type
 } elm_type;
 
 static const char* elm_types_names[] = 
 {
-	"Real",
-	"Integer",
-	"Void"
+	"real",
+	"integer",
+	"void"
 };
 
 #endif
