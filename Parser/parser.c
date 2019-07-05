@@ -148,11 +148,11 @@ elm_type TYPE()
 		case TOKEN_KEYWORD_REAL:
 			output("TYPE -> real");
 			match(TOKEN_KEYWORD_REAL);
-			return REAL;
+			return REAL_T;
 		case TOKEN_KEYWORD_INTEGER: 
 			output("TYPE -> integer");
 			match(TOKEN_KEYWORD_INTEGER);
-			return INTEGER;
+			return INTEGER_T;
 		default: 
 			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 1);

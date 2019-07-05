@@ -4,8 +4,8 @@
 /* ID Type */
 typedef enum elm_type
 {
-	REAL,
-	INTEGER,
+	REAL_T,
+	INTEGER_T,
 	VOID_T 	// for function returned type
 } elm_type;
 
