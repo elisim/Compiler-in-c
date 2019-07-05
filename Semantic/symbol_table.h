@@ -4,6 +4,8 @@
 #include "elm_type.h"
 #define TABLE_SIZE 1024 
 
+extern FILE *semantic_out;
+
 /* 
 ID in the table;
 For variable, consider only var_type and var_size. 

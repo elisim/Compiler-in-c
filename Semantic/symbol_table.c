@@ -1,229 +1,56 @@
-// C++ program to implement Symbol Table 
-#include <iostream> 
-using namespace std; 
 
-const int MAX = 100; 
+/*
+Called when entering into a nested block in the program; 
+creates symbol table for this block, and links it to the table of the current scope
+*/
+table_ptr make_table(table_ptr current_table);
 
-class Node { 
+/*
+Called when exiting from a nested block; 
+returns pointer to the enclosing block’s table (i.e. table of the exited block's "father")
+*/
+table_ptr pop_table(table_ptr current_table);
 
-	string identifier, scope, type; 
-	int lineNo; 
-	Node* next; 
+/*
+Called when a variable declaration is processed. 
+Inserts the variable name and type into symbol table of the current scope, and returns pointer to the new entry. 
+Before insertion, checks whether the  id_name already appears in the current table (for this, uses function lookup). 
+If yes then returns NULL; this indicates to an error (duplicate declaration of the same name) that should be reported.
+*/
+table_entry insert(table_ptr current_table, char *id_name)
+{
+	if (error...) // TODO
+		print_semantic_error(id_already_defined, id_name);
+		return NULL;
+}     
 
-public: 
-	Node() 
-	{ 
-		next = NULL; 
-	} 
+/*
+Searches for a variable name in symbol table of the current scope (only); 
+returns pointer to the found entry, or NULL if the name is not found in that table
+*/
+table_entry lookup(table_ptr current_table, char *id_name);
 
-	Node(string key, string value, string type, int lineNo) 
-	{ 
-		this->identifier = key; 
-		this->scope = value; 
-		this->type = type; 
-		this->lineNo = lineNo; 
-		next = NULL; 
-	} 
+/*
+Called when variable use is found in assignment;  
+allows to check whether the variable is declared. 
+For this, performs hierarchical search of the variable name, starting from the symbol table of the current scope; 
+returns the found entry pointer, or NULL (if the variable is undeclared). 
+*/
+table_entry find(table_ptr current_table, char* id_name);
 
-	void print() 
-	{ 
-		cout << "Identifier's Name:" << identifier 
-			<< "\nType:" << type 
-			<< "\nScope: " << scope 
-			<< "\nLine Number: " << lineNo << endl; 
-	} 
-	friend class SymbolTable; 
-}; 
+/*
+Called when id declaration is processed, to store its type in the symbol type.
+*/
+void set_id_type(table_entry id_entry, elm_type id_type);
 
-class SymbolTable { 
-	Node* head[MAX]; 
+/*
+Called when assignment is processed, for variables that appear in its left and right sides. 
+Returns variable's type (integer or real)
+*/
+elm_type get_id_type (table_entry id_entry);
 
-public: 
-	SymbolTable() 
-	{ 
-		for (int i = 0; i < MAX; i++) 
-			head[i] = NULL; 
-	} 
 
-	int hashf(string id); // hash function 
-	bool insert(string id, string scope, 
-				string Type, int lineno); 
-
-	string find(string id); 
-
-	bool deleteRecord(string id); 
-
-	bool modify(string id, string scope, 
-				string Type, int lineno); 
-}; 
-
-// Function to modify an identifier 
-bool SymbolTable::modify(string id, string s, 
-						string t, int l) 
-{ 
-	int index = hashf(id); 
-	Node* start = head[index]; 
-
-	if (start == NULL) 
-		return "-1"; 
-
-	while (start != NULL) { 
-		if (start->identifier == id) { 
-			start->scope = s; 
-			start->type = t; 
-			start->lineNo = l; 
-			return true; 
-		} 
-		start = start->next; 
-	} 
-
-	return false; // id not found 
-} 
-
-// Function to delete an identifier 
-bool SymbolTable::deleteRecord(string id) 
-{ 
-	int index = hashf(id); 
-	Node* tmp = head[index]; 
-	Node* par = head[index]; 
-
-	// no identifier is present at that index 
-	if (tmp == NULL) { 
-		return false; 
-	} 
-	// only one identifier is present 
-	if (tmp->identifier == id && tmp->next == NULL) { 
-		tmp->next = NULL; 
-		delete tmp; 
-		return true; 
-	} 
-
-	while (tmp->identifier != id && tmp->next != NULL) { 
-		par = tmp; 
-		tmp = tmp->next; 
-	} 
-	if (tmp->identifier == id && tmp->next != NULL) { 
-		par->next = tmp->next; 
-		tmp->next = NULL; 
-		delete tmp; 
-		return true; 
-	} 
-
-	// delete at the end 
-	else { 
-		par->next = NULL; 
-		tmp->next = NULL; 
-		delete tmp; 
-		return true; 
-	} 
-	return false; 
-} 
-
-// Function to find an identifier 
-string SymbolTable::find(string id) 
-{ 
-	int index = hashf(id); 
-	Node* start = head[index]; 
-
-	if (start == NULL) 
-		return "-1"; 
-
-	while (start != NULL) { 
-
-		if (start->identifier == id) { 
-			start->print(); 
-			return start->scope; 
-		} 
-
-		start = start->next; 
-	} 
-
-	return "-1"; // not found 
-} 
-
-// Function to insert an identifier 
-bool SymbolTable::insert(string id, string scope, 
-						string Type, int lineno) 
-{ 
-	int index = hashf(id); 
-	Node* p = new Node(id, scope, Type, lineno); 
-
-	if (head[index] == NULL) { 
-		head[index] = p; 
-		cout << "\n"
-			<< id << " inserted"; 
-
-		return true; 
-	} 
-
-	else { 
-		Node* start = head[index]; 
-		while (start->next != NULL) 
-			start = start->next; 
-
-		start->next = p; 
-		cout << "\n"
-			<< id << " inserted"; 
-
-		return true; 
-	} 
-
-	return false; 
-} 
-
-int SymbolTable::hashf(string id) 
-{ 
-	int asciiSum = 0; 
-
-	for (int i = 0; i < id.length(); i++) { 
-		asciiSum = asciiSum + id[i]; 
-	} 
-
-	return (asciiSum % 100); 
-} 
-
-// Driver code 
-int main() 
-{ 
-	SymbolTable st; 
-	string check; 
-	cout << "**** SYMBOL_TABLE ****\n"; 
-
-	// insert 'if' 
-	if (st.insert("if", "local", "keyword", 4)) 
-		cout << " -successfully"; 
-	else
-		cout << "\nFailed to insert.\n"; 
-
-	// insert 'number' 
-	if (st.insert("number", "global", "variable", 2)) 
-		cout << " -successfully\n\n"; 
-	else
-		cout << "\nFailed to insert\n"; 
-
-	// find 'if' 
-	check = st.find("if"); 
-	if (check != "-1") 
-		cout << "Identifier Is present\n"; 
-	else
-		cout << "\nIdentifier Not Present\n"; 
-
-	// delete 'if' 
-	if (st.deleteRecord("if")) 
-		cout << "if Identifier is deleted\n"; 
-	else
-		cout << "\nFailed to delete\n"; 
-
-	// modify 'number' 
-	if (st.modify("number", "global", "variable", 3)) 
-		cout << "\nNumber Identifier updated\n"; 
-
-	// find and print 'number' 
-	check = st.find("number"); 
-	if (check != "-1") 
-		cout << "Identifier Is present\n"; 
-	else
-		cout << "\nIdentifier Not Present"; 
-
-	return 0; 
-} 
+static void print_semantic_error(error_msg, id_name)
+{
+	sprintf(semantic_out, error_msg, id_name);
+}

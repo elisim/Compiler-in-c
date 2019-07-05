@@ -182,7 +182,7 @@ void VARIABLES_LIST(elm_type var_type)
 
 
 /* VARIABLES_LIST_TEMP -> ,VARIABLE VARIABLES_LIST_TEMP | ε */
-void VARIABLES_LIST_TEMP(var_type)
+void VARIABLES_LIST_TEMP(elm_type var_type)
 {
 	eTOKENS follows[2] = {TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	eTOKENS expected[3] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
@@ -193,8 +193,8 @@ void VARIABLES_LIST_TEMP(var_type)
 		case TOKEN_COMMA:	
 			output("VARIABLES_LIST_TEMP -> ,VARIABLE VARIABLES_LIST_TEMP");
 			match(TOKEN_COMMA);
-			VARIABLE();
-			VARIABLES_LIST_TEMP();
+			VARIABLE(var_type);
+			VARIABLES_LIST_TEMP(var_type);
 			break;
 		case TOKEN_SEMICOLON:
 		case TOKEN_RIGHT_BRACKET3:
@@ -208,7 +208,7 @@ void VARIABLES_LIST_TEMP(var_type)
 }
 
 /* VARIABLE -> id VARIABLE_TEMP */
-void VARIABLE()
+void VARIABLE(elm_type var_type)
 {
 	eTOKENS follows[3] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3};
 	eTOKENS expected[4] = {TOKEN_COMMA, TOKEN_SEMICOLON, TOKEN_RIGHT_BRACKET3,  TOKEN_ID};
@@ -217,6 +217,9 @@ void VARIABLE()
 	if (curr_token->kind == TOKEN_ID)
 	{
 		output("VARIABLE -> id VARIABLE_TEMP");
+		id_table_entry = insert(curr_table, curr_token->lexeme);
+		if (id_table_entry != NULL)
+			set_id_type(id_table_entry, var_type);
 		VARIABLE_TEMP();
 	}
 	else
