@@ -25,7 +25,7 @@ elm_type TYPE();
 void VARIABLES_LIST(elm_type);
 void VARIABLES_LIST_TEMP(elm_type);
 void VARIABLE(elm_type);
-void VARIABLE_TEMP();
+int VARIABLE_TEMP(elm_type);
 void FUNC_DEFINITIONS();
 void FUNC_DEFINITIONS_TEMP();
 void FUNC_DEFINITION();

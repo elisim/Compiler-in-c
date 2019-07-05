@@ -217,10 +217,11 @@ void VARIABLE(elm_type var_type)
 	if (curr_token->kind == TOKEN_ID)
 	{
 		output("VARIABLE -> id VARIABLE_TEMP");
-		id_table_entry = insert(curr_table, curr_token->lexeme);
+
+		int array_size = VARIABLE_TEMP(var_type);
+		table_entry* id_table_entry = insert(curr_table, curr_token->lexeme); // TODO
 		if (id_table_entry != NULL)
 			set_id_type(id_table_entry, var_type);
-		VARIABLE_TEMP();
 	}
 	else
 	{
@@ -230,10 +231,11 @@ void VARIABLE(elm_type var_type)
 }
 
 /* VARIABLE_TEMP -> [int_number] | ε */
-void VARIABLE_TEMP()
+int VARIABLE_TEMP(elm_type var_type)
 {
 	eTOKENS follows[4] = {TOKEN_SEMICOLON, TOKEN_COMMA, TOKEN_RIGHT_BRACKET3, TOKEN_OP_EQUAL};
 	eTOKENS expected[5] = {TOKEN_LEFT_BRACKET1, TOKEN_COMMA, TOKEN_RIGHT_BRACKET3, TOKEN_SEMICOLON, TOKEN_OP_EQUAL};
+	int array_size = -1;
 
 	curr_token = next_token();
 	switch(curr_token->kind)
@@ -242,7 +244,8 @@ void VARIABLE_TEMP()
 			output("VARIABLE_TEMP -> [int_number]");
 			match(TOKEN_LEFT_BRACKET1);
 			curr_token = next_token();
-			match(TOKEN_INT_NUMBER);
+			if(match(TOKEN_INT_NUMBER) == SUCCESS);
+				array_size = atoi(curr_token->lexeme);
 			curr_token = next_token();
 			match(TOKEN_RIGHT_BRACKET1);
 			break;
@@ -256,7 +259,9 @@ void VARIABLE_TEMP()
 		default:
 			error(expected, sizeof(expected)/sizeof(expected[0]));
 			recover(follows, 4);
+			break;
 	}
+	return array_size;
 }
 
 /* FUNC_DEFINITIONS -> FUNC_DEFINITION FUNC_DEFINITIONS_TEMP */
@@ -319,9 +324,10 @@ void FUNC_DEFINITION()
 	int size = 4;
 
 	output("FUNC_DEFINITION -> RETURNED_TYPE id (PARAM_DEFINITIONS) BLOCK");
-	RETURNED_TYPE();
+	elm_type func_returned_type = RETURNED_TYPE();
 	curr_token = next_token();
 	match(TOKEN_ID);
+	char* func_name = curr_token->lexeme;
 	curr_token = next_token();
 	match(TOKEN_LEFT_BRACKET3);
 	PARAM_DEFINITIONS();

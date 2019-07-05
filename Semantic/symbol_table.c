@@ -1,3 +1,4 @@
+#include "symbol_table.h"
 
 /*
 Called when entering into a nested block in the program; 
